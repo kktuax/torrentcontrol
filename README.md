@@ -9,7 +9,7 @@ Torrentcontrol lets you automate usual tasks with [transmission BT client](http:
 # Install the dependencies
 
     sudo apt-get install python-pip transmission-cli
-    sudo pip install beautifulsoup4 apscheduler
+    sudo pip install beautifulsoup4 apscheduler requests
 
 # Clone torrentcontrol and launch
 
