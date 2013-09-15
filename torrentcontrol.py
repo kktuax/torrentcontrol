@@ -55,7 +55,7 @@ def add_new_serie_episodes():
 	with open(history_fname, 'w') as outfile:
 		json.dump(history, outfile, indent=4)
 		
-sched = Scheduler()
+sched = Scheduler(standalone=True)
 conf = load_json('torrentcontrol.conf')
 time_re = re.compile("(\d+):(\d+)")
 start_res = time_re.search(conf.get('download-start-time', ""))
@@ -78,6 +78,3 @@ if series_res:
 	sched.add_cron_job(add_new_serie_episodes, hour=series_hour, minute=series_minute)
 
 sched.start()
-
-while True:
-	pass
