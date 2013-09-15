@@ -1,23 +1,44 @@
-import re, json, os, urllib2
+import re, json, os
 from eztv import EztvMagnetProvider
+from apscheduler.scheduler import Scheduler
+from transmissionremote import start_torrent, stop_torrent, get_ids
 
-def submit_to_transmission(transmission_location, link):
-	url = transmission_location + '/rpc?method=torrent-add&filename=' + link
-	urllib2.urlopen(url)
-
-def parse_json_conf(fname):
+def chdir():
 	abspath = os.path.abspath(__file__)
 	dname = os.path.dirname(abspath)
 	os.chdir(dname)
+
+def load_json(fname):
 	conf = {}
 	if os.path.isfile(fname):
 		conf = json.load(open(fname))
 	return(conf)
-	
 
-conf = parse_json_conf('torrentdownloader.conf')
+sched = Scheduler()
+
+def stop_torrents():
+	map( stop_torrent, get_ids() )
+
+def start_torrents():
+	map( start_torrent, get_ids() )
+
+chdir()
+conf = load_json('torrentdownloader.conf')
+time_re = re.compile("(\d+):(\d+)")
+start_res = time_re.search(conf.get('download-start-time', ""))
+stop_res = time_re.search(conf.get('download-stop-time', ""))
+if start_res and stop_res:
+	start_hour = start_res.group(1)
+	start_minute = start_res.group(2)
+	stop_hour = stop_res.group(1)
+	stop_minute = stop_res.group(2)
+	print "Scheduling start at " + start_hour + ":" + start_minute
+	sched.add_cron_job(start_torrents, hour=start_hour, minute=start_minute)
+	print "Scheduling stop at " + stop_hour + ":" + stop_minute
+	sched.add_cron_job(stop_torrents, hour=stop_hour, minute=stop_minute)
 
 
+sched.start()
 providers = list()
 providers.append(EztvMagnetProvider())
 
