@@ -31,7 +31,7 @@ def add_new_serie_episodes():
 	history_fname = 'history.json'
 	history = load_json(history_fname)
 	episode_re = re.compile(".+([sS]\d+[eE]\d+).+")
-	series = load_json('torrentdownloader.conf').get('series', [])
+	series = load_json('torrentcontrol.conf').get('series', [])
 	for serie in series:
 		print "Searching for episodes of " + serie
 		eresults = dict()
@@ -56,7 +56,7 @@ def add_new_serie_episodes():
 		json.dump(history, outfile, indent=4)
 		
 sched = Scheduler()
-conf = load_json('torrentdownloader.conf')
+conf = load_json('torrentcontrol.conf')
 time_re = re.compile("(\d+):(\d+)")
 start_res = time_re.search(conf.get('download-start-time', ""))
 stop_res = time_re.search(conf.get('download-stop-time', ""))
