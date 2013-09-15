@@ -1,7 +1,7 @@
 torrentcontrol
 ==============
 
-Torrentcontrol lets you automate usual tasks with [http://www.transmissionbt.com/ transmission BT client]:
+Torrentcontrol lets you automate usual tasks with [transmission BT client](http://www.transmissionbt.com/):
 
  * Automatic download of new episodes
  * Schedule download times  
@@ -9,7 +9,7 @@ Torrentcontrol lets you automate usual tasks with [http://www.transmissionbt.com
 # Install the dependencies
 
     sudo apt-get install python-pip transmission-cli
-	sudo pip install beautifulsoup4 apscheduler
+    sudo pip install beautifulsoup4 apscheduler requests
 
 # Clone torrentcontrol and launch
 
@@ -21,11 +21,9 @@ Torrentcontrol lets you automate usual tasks with [http://www.transmissionbt.com
 	
 # Configuration file
 
-You can customize download times and automatic serie's episode addition.
+You can customize download times and automatic serie's episode addition editing torrentcontrol.conf:
 
-	nano ~/torrentcontrol/torrentcontrol.conf
-
-    {
+	{
 	"download-start-time": "1:30",
 	"download-stop-time": "8:30",
 	"series-search-time": "2:00",
@@ -42,4 +40,3 @@ You can customize download times and automatic serie's episode addition.
 		"it crowd"
 		]
 	}
-	
