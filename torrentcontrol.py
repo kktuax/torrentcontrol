@@ -1,10 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import re, json, os, tempfile
+import re, json, os
 from eztv import EztvMagnetProvider
 from apscheduler.scheduler import Scheduler
-from apscheduler.jobstores.shelve_store import ShelveJobStore
 from transmissionremote import start_torrent, stop_torrent, add_torrent, get_ids
 
 def chdir():
@@ -57,7 +56,6 @@ def add_new_serie_episodes():
 		json.dump(history, outfile, indent=4)
 		
 sched = Scheduler(standalone=True)
-sched.add_jobstore(ShelveJobStore(tempfile.gettempdir() + '/torrentcontrol.dbfile'), 'file')
 
 conf = load_json('torrentcontrol.conf')
 time_re = re.compile("(\d+):(\d+)")
