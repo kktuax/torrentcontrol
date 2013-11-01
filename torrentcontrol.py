@@ -41,6 +41,7 @@ def add_new_serie_episodes():
 				episode_res = episode_re.search(key)
 				if episode_res:
 					eresults[episode_res.group(1)] = results[key]
+			del results
 		
 		if history.has_key(serie):
 			for episode in sorted(eresults.keys()):
@@ -51,9 +52,12 @@ def add_new_serie_episodes():
 		else:
 			last_episode = sorted(eresults.keys(), reverse=True)[0]
 			history[serie] = last_episode
+		del eresults
 			
 	with open(history_fname, 'w') as outfile:
 		json.dump(history, outfile, indent=4)
+	del history
+	del providers
 		
 sched = Scheduler(standalone=True)
 
