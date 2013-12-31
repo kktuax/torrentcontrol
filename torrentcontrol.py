@@ -55,7 +55,7 @@ parser.add_argument('--start', help='Starts all torrents', action='store_true')
 parser.add_argument('--stop', help='Stops all torrents', action='store_true')
 parser.add_argument('--auto-series', dest="series", help='Searches for new episodes', action='store_true')
 parser.add_argument('--conf-file', dest="conf", help='Location of configuration file', default= os.path.join(os.getcwd(), 'torrentcontrol.conf'))
-parser.add_argument('--history-file', dest="history", help='Location of configuration file', default= os.path.join(os.getcwd(), 'history.json'))
+parser.add_argument('--history-file', dest="history", help='Location of history file', default= os.path.join(os.getcwd(), 'history.json'))
 args = parser.parse_args()
 
 if args.series:
@@ -71,4 +71,4 @@ if args.start:
 	start_torrents()
 	
 if args.stop:
-	start_torrents()
+	stop_torrents()
