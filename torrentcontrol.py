@@ -1,24 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import re, json, os, tempfile
+import re, json, os, argparse
 from eztv import EztvMagnetProvider
-from apscheduler.scheduler import Scheduler
-from apscheduler.jobstores.shelve_store import ShelveJobStore
 from transmissionremote import start_torrent, stop_torrent, add_torrent, get_ids
-
-def chdir():
-	abspath = os.path.abspath(__file__)
-	dname = os.path.dirname(abspath)
-	os.chdir(dname)
-
-def load_json(fname):
-	conf = {}
-	if os.path.isfile(fname):
-		conf = json.load(open(fname))
-	return conf
-
-chdir()
 
 def stop_torrents():
 	map( stop_torrent, get_ids() )
@@ -26,13 +11,10 @@ def stop_torrents():
 def start_torrents():
 	map( start_torrent, get_ids() )
 
-def add_new_serie_episodes():
+def add_new_serie_episodes(series = [], history = {}):
 	providers = list()
 	providers.append(EztvMagnetProvider())
-	history_fname = 'history.json'
-	history = load_json(history_fname)
 	episode_re = re.compile(".+([sS]\d+[eE]\d+).+")
-	series = load_json('torrentcontrol.conf').get('series', [])
 	for serie in series:
 		print "Searching for episodes of " + serie
 		eresults = dict()
@@ -53,31 +35,40 @@ def add_new_serie_episodes():
 			last_episode = sorted(eresults.keys(), reverse=True)[0]
 			history[serie] = last_episode
 			
+	return history
+
+def chdir():
+	abspath = os.path.abspath(__file__)
+	dname = os.path.dirname(abspath)
+	os.chdir(dname)
+
+def load_json(fname):
+	conf = {}
+	if os.path.isfile(fname):
+		conf = json.load(open(fname))
+	return conf
+
+chdir()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--start', help='Starts all torrents', action='store_true')
+parser.add_argument('--stop', help='Stops all torrents', action='store_true')
+parser.add_argument('--auto-series', dest="series", help='Searches for new episodes', action='store_true')
+parser.add_argument('--conf-file', dest="conf", help='Location of configuration file', default= os.path.join(os.getcwd(), 'torrentcontrol.conf'))
+parser.add_argument('--history-file', dest="history", help='Location of configuration file', default= os.path.join(os.getcwd(), 'history.json'))
+args = parser.parse_args()
+
+if args.series:
+	conf = load_json(args.conf)
+	series = conf.get('series', [])
+	history_fname = args.history
+	history = load_json(history_fname)
+	history = add_new_serie_episodes(series, history)
 	with open(history_fname, 'w') as outfile:
 		json.dump(history, outfile, indent=4)
-		
-sched = Scheduler(standalone=True)
-sched.add_jobstore(ShelveJobStore(tempfile.gettempdir() + '/torrentcontrol.dbfile'), 'file')
 
-conf = load_json('torrentcontrol.conf')
-time_re = re.compile("(\d+):(\d+)")
-start_res = time_re.search(conf.get('download-start-time', ""))
-stop_res = time_re.search(conf.get('download-stop-time', ""))
-if start_res and stop_res:
-	start_hour = start_res.group(1)
-	start_minute = start_res.group(2)
-	stop_hour = stop_res.group(1)
-	stop_minute = stop_res.group(2)
-	print "Scheduling start at " + start_hour + ":" + start_minute
-	sched.add_cron_job(start_torrents, hour=start_hour, minute=start_minute)
-	print "Scheduling stop at " + stop_hour + ":" + stop_minute
-	sched.add_cron_job(stop_torrents, hour=stop_hour, minute=stop_minute)
-
-series_res = time_re.search(conf.get('series-search-time', "2:00"))
-if series_res:
-	series_hour = series_res.group(1)
-	series_minute = series_res.group(2)
-	print "Scheduling series search at " + series_hour + ":" + series_minute
-	sched.add_cron_job(add_new_serie_episodes, hour=series_hour, minute=series_minute)
-
-sched.start()
+if args.start:
+	start_torrents()
+	
+if args.stop:
+	start_torrents()
