@@ -14,7 +14,7 @@ def start_torrents():
 def add_new_serie_episodes(series = [], history = {}):
 	providers = list()
 	providers.append(EztvMagnetProvider())
-	episode_re = re.compile(".+([sS]\d+[eE]\d+).+")
+	episode_re = re.compile(".+[sS]?(\d+)[eExX](\d+).+")
 	for serie in series:
 		print "Searching for episodes of " + serie
 		eresults = dict()
@@ -23,7 +23,8 @@ def add_new_serie_episodes(series = [], history = {}):
 			for key in results.keys():
 				episode_res = episode_re.search(key)
 				if episode_res:
-					eresults[episode_res.group(1)] = results[key]
+					ecode = "S" + episode_res.group(1).zfill(3) + "E" + episode_res.group(2).zfill(3)
+					eresults[ecode] = results[key]
 		
 		if history.has_key(serie):
 			for episode in sorted(eresults.keys()):
