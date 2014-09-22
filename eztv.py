@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 class EztvMagnetProvider(object):
 	
-	SEARCH_URL = "http://eztv.it/search/"
+	SEARCH_URL = "https://eztv.it/search/"
 	series = dict()		
 		
 	def __init__(self):   
